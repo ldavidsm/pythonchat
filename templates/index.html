@@ -1,0 +1,126 @@
+<!doctype html>
+<html>
+    <head>
+        <style>
+            body {
+                font-family: Arial, sans-serif;
+                margin: 0;
+                padding: 0;
+                background-color: #f4f4f9;
+                display: flex;
+                justify-content: center;
+                align-items: center;
+                height: 100vh;
+            }
+
+            main {
+                width: 400px;
+                border: 1px solid #ddd;
+                border-radius: 8px;
+                box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+                background: white;
+                display: flex;
+                flex-direction: column;
+                overflow: hidden;
+            }
+
+            section {
+                flex-grow: 1;
+                border-bottom: 1px solid #ddd;
+                padding: 10px;
+                overflow-y: auto;
+                background-color: #f9f9f9;
+                max-height:400px;
+            }
+
+            article {
+                background: #007bff;
+                color: white;
+                padding: 8px 12px;
+                margin: 5px 0;
+                border-radius: 0px 12px 12px 12px;
+                max-width: 75%;
+                word-wrap: break-word;
+                font-size: 14px;
+            }
+
+            /*article:nth-child(odd) {
+                background: #e0e0e0;
+                color: #333;
+                margin-left: auto;
+            }*/
+
+            input {
+                border: none;
+                border-top: 1px solid #ddd;
+                padding: 10px;
+                font-size: 16px;
+                outline: none;
+                flex-shrink: 0;
+            }
+
+            input:focus {
+                background: #f4f4f9;
+            }
+
+            ::-webkit-scrollbar {
+                width: 8px;
+            }
+
+            ::-webkit-scrollbar-thumb {
+                background: #bbb;
+                border-radius: 4px;
+            }
+
+            ::-webkit-scrollbar-thumb:hover {
+                background: #888;
+            }
+            h6{padding:0px;margin:0px;}
+        </style>
+    </head>
+    <body>
+        <main>
+            <input placeholder="Indica tu nombre" id="usuario">
+            <section>
+            </section>
+            <input placeholder="Indica tu mensaje" id="mensaje">
+        </main>
+        <script>
+            var temporizador;
+            temporizador = setTimeout(bucle, 1000);
+
+            function bucle() {
+                fetch("http://localhost:3000/recibe")
+                .then(function(response) {
+                    return response.json();
+                })
+                .then(function(datos) {
+                    console.log(datos)
+                    document.querySelector("section").scrollTop = 10000000
+                    document.querySelector("section").innerHTML = "";
+                    datos.forEach(function(dato) {
+                        let mensaje = document.createElement("article");
+                        let usuario = document.createElement("h6")
+                        usuario.textContent = dato.usuario
+                        mensaje.appendChild(usuario)
+                        let texto = document.createElement("p")
+                        texto.textContent = dato.mensaje
+                        mensaje.appendChild(texto)
+                    
+                        
+                        document.querySelector("section").appendChild(mensaje);
+                    });
+                });
+                clearTimeout(temporizador);
+                temporizador = setTimeout(bucle, 1000);
+            }
+
+            document.querySelector("#mensaje").onkeypress = function(e) {
+                if (e.key == "Enter") {
+                    fetch("http://localhost:3000/envia?mensaje=" + encodeURI(this.value)+"&usuario="+encodeURI(document.querySelector("#usuario").value));
+                    this.value = "";
+                }
+            };
+        </script>
+    </body>
+</html>
